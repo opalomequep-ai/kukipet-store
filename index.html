@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kukipet - Pastelería para Mascotas | Cuenca, Ecuador</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4ECDC4;
+            --secondary: #E07A5F;
+            --dark: #2D3142;
+            --light: #FFF9F0;
+            --gray: #95A5A6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .lang-toggle {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .city-counter {
+            background: white;
+            padding: 10px 20px;
+            margin: 0;
+            text-align: center;
+            font-weight: bold;
+            border-bottom: 3px solid var(--primary);
+            display: none;
+        }
+
+        .city-counter.active {
+            display: block;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 200;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+        }
+
+        .modal-content h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .city-option {
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid var(--gray);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .city-option:hover {
+            border-color: var(--primary);
+            background: rgba(78, 205, 196, 0.1);
+        }
+
+        .city-option.selected {
+            border-color: var(--primary);
+            background: rgba(78, 205, 196, 0.2);
+        }
+
+        .city-name {
+            font-weight: bold;
+            font-size: 16px;
+            color: var(--dark);
+        }
+
+        .city-min {
+            font-size: 14px;
+            color: var(--secondary);
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 10px 5px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+        }
+
+        .btn-cancel {
+            background: var(--gray);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .product-emoji {
+            font-size: 60px;
+            margin: 10px 0;
+        }
+
+        .product-name {
+            font-weight: bold;
+            font-size: 18px;
+            color: var(--dark);
+            margin: 10px 0;
+        }
+
+        .product-price {
+            color: var(--secondary);
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .product-desc {
+            font-size: 14px;
+            color: var(--gray);
+            margin: 10px 0;
+        }
+
+        .cart {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-top: 30px;
+        }
+
+        .cart-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .cart-total {
+            padding: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary);
+            text-align: right;
+            border-top: 3px solid var(--primary);
+        }
+
+        .cart-message {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .cart-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .cart-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .form-group {
+            margin: 15px 0;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .modal-content {
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <div class="logo">🐾 KUKIPET</div>
+    <button class="lang-toggle" onclick="toggleLanguage()">EN</button>
+</div>
+
+<!-- CITY COUNTER -->
+<div class="city-counter" id="cityCounter"></div>
+
+<!-- CITY SELECTION MODAL -->
+<div class="modal active" id="cityModal">
+    <div class="modal-content">
+        <h2 id="cityTitle">Selecciona tu ciudad</h2>
+
+        <div class="city-option" onclick="selectCity('Cuenca', 15)">
+            <div class="city-name">📍 Cuenca</div>
+            <div class="city-min">Mínimo: $15.00</div>
+        </div>
+
+        <div class="city-option" onclick="selectCity('Azogues', 25)">
+            <div class="city-name">📍 Azogues</div>
+            <div class="city-min">Mínimo: $25.00</div>
+        </div>
+
+        <div class="city-option" onclick="selectCity('Gualaceo', 25)">
+            <div class="city-name">📍 Gualaceo</div>
+            <div class="city-min">Mínimo: $25.00</div>
+        </div>
+
+        <button class="btn" id="continueBtn" disabled onclick="confirmCity()" style="width: 100%; margin-top: 20px;">
+            <span id="continueText">Continuar</span>
+        </button>
+    </div>
+</div>
+
+<!-- MAIN CONTAINER -->
+<div class="container" id="mainContainer" style="display: none;">
+
+    <h1 id="mainTitle" style="text-align: center; color: var(--primary); margin: 30px 0;">🎂 Elige tus productos</h1>
+
+    <!-- COMBOS PREDEFINIDOS -->
+    <h2 id="combosTitle" style="color: var(--dark); margin: 20px 0;">🎁 Combos Predefinidos</h2>
+    <div class="products-grid" id="combosGrid"></div>
+
+    <!-- PRODUCTOS INDIVIDUALES -->
+    <h2 id="productsTitle" style="color: var(--dark); margin: 20px 0;">🦴 Arma tu Combo</h2>
+    <div class="products-grid" id="productsGrid"></div>
+
+    <!-- CARRITO -->
+    <div class="cart" id="cartSection">
+        <h2 id="cartTitle">🛒 Tu Pedido</h2>
+        <div id="cartItems"></div>
+        <div class="cart-total" id="cartTotal">Total: $0.00</div>
+        <div id="cartMessage"></div>
+        <button class="btn btn-secondary" style="width: 100%; margin-top: 15px;"
+                id="whatsappBtn" disabled onclick="sendToWhatsapp()">
+            <span id="whatsappText">Pedir por WhatsApp</span>
+        </button>
+    </div>
+</div>
+
+<!-- MODAL: COMBO DETAILS -->
+<div class="modal" id="comboModal">
+    <div class="modal-content">
+        <h2 id="comboModalTitle"></h2>
+
+        <div class="form-group">
+            <label id="petNameLabel">Nombre de la mascota *</label>
+            <input type="text" id="petName" placeholder="Ej: Max">
+        </div>
+
+        <div class="form-group">
+            <label id="petAgeLabel">Edad *</label>
+            <input type="number" id="petAge" placeholder="Ej: 5" min="0">
+        </div>
+
+        <div id="birthdaySection" style="display: none;">
+            <div class="form-group">
+                <label id="petPhotoLabel">Foto de la mascota *</label>
+                <input type="file" id="petPhoto" accept="image/*">
+                <small id="photoSmall" style="color: var(--gray);">*Requerido para cumpleaños</small>
+            </div>
+
+            <div class="form-group">
+                <label id="cakeThemeLabel">Temática de la torta *</label>
+                <input type="text" id="cakeTheme" placeholder="Ej: Superhéroes, Flores, etc">
+            </div>
+        </div>
+
+        <div style="text-align: center;">
+            <button class="btn" onclick="addComboToCart()">
+                <span id="addComboText">Agregar al Pedido</span>
+            </button>
+            <button class="btn btn-cancel" onclick="closeComboModal()">
+                <span id="cancelText">Cancelar</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: CHECKOUT -->
+<div class="modal" id="checkoutModal">
+    <div class="modal-content">
+        <h2 id="checkoutTitle">📋 Datos de Entrega</h2>
+
+        <div class="form-group">
+            <label id="nameLabel">Nombre Completo *</label>
+            <input type="text" id="customerName" placeholder="Juan Pérez">
+        </div>
+
+        <div class="form-group">
+            <label id="phoneLabel">Teléfono *</label>
+            <input type="tel" id="customerPhone" placeholder="0987654321">
+        </div>
+
+        <div class="form-group">
+            <label id="addressLabel">Dirección de Entrega *</label>
+            <input type="text" id="customerAddress" placeholder="Av. Principal 123">
+        </div>
+
+        <div class="form-group">
+            <label id="dateLabel">Fecha de Entrega *</label>
+            <input type="date" id="deliveryDate">
+        </div>
+
+        <div class="form-group">
+            <label id="notesLabel">Notas Adicionales</label>
+            <textarea id="customerNotes" placeholder="Sin sal, sin azúcar, etc" rows="3"></textarea>
+        </div>
+
+        <div style="text-align: center;">
+            <button class="btn btn-secondary" onclick="submitCheckout()">
+                <span id="submitText">Enviar a WhatsApp</span>
+            </button>
+            <button class="btn btn-cancel" onclick="closeCheckout()">
+                <span id="closeCheckoutText">Cancelar</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1r7SNKblj-3yleLlVm1f2H7PkgTGBNUg0Vs25KsI6hGc/pub?output=csv';
+const WHATSAPP_NUMBER = '593987392552';
+
+const HARDCODED_PRODUCTS = {
+    'ga001': { name: 'Doglletas', type: 'producto', price: 1.50, desc: 'Galletas avena e hígado', emoji: '🍪', active: 'SI' },
+    'pz001': { name: 'Petzza', type: 'producto', price: 5.00, desc: 'Pizza para mascotas', emoji: '🍕', active: 'SI' },
+    'pz002': { name: 'Mini Petzza', type: 'producto', price: 1.00, desc: 'Pizza mini', emoji: '🍕', active: 'SI' },
+    'pe001': { name: 'Petlados Pollo', type: 'producto', price: 1.50, desc: 'Helado pollo e hígado', emoji: '🍦', active: 'SI' },
+    'pe002': { name: 'Petlados Patitas', type: 'producto', price: 1.75, desc: 'Helado patitas cerdo', emoji: '🍦', active: 'SI' },
+    'pe003': { name: 'Petlados Hígado', type: 'producto', price: 1.50, desc: 'Helado hígado', emoji: '🍦', active: 'SI' },
+    'To001': { name: 'Torta Cumple 17cm', type: 'producto', price: 15.00, desc: 'Torta tamaño mediano', emoji: '🎂', active: 'SI' },
+    'To002': { name: 'Torta Cumple 30cm', type: 'producto', price: 30.00, desc: 'Torta tamaño grande', emoji: '🎂', active: 'SI' },
+    'To003': { name: 'Torta Mini', type: 'producto', price: 8.00, desc: 'Torta pequeña', emoji: '🎂', active: 'SI' },
+    'C001': { name: 'Cumplelamidos', type: 'combo', price: 22.00, desc: 'Pack cumpleaños premium', emoji: '🎁', active: 'SI' },
+    'C002': { name: 'Bokado Real', type: 'combo', price: 20.00, desc: 'Surtido gourmet', emoji: '🎁', active: 'SI' },
+    'C003': { name: 'Kukifest', type: 'combo', price: 25.00, desc: 'Fiesta completa', emoji: '🎁', active: 'SI' },
+    'C004': { name: 'Antojo Perruno', type: 'combo', price: 12.00, desc: 'Pack básico', emoji: '🎁', active: 'SI' }
+};
+
+let selectedCity = null, minAmount = 0, cart = [], currentLang = 'es', products = {}, currentComboCode = null;
+
+const TRANSLATIONS = {
+    es: {
+        cityTitle: 'Selecciona tu ciudad', continueText: 'Continuar', mainTitle: '🎂 Elige tus productos',
+        combosTitle: '🎁 Combos Predefinidos', productsTitle: '🦴 Arma tu Combo', cartTitle: '🛒 Tu Pedido',
+        whatsappText: 'Pedir por WhatsApp', petNameLabel: 'Nombre de la mascota *', petAgeLabel: 'Edad *',
+        petPhotoLabel: 'Foto de la mascota *', photoSmall: '*Requerido para cumpleaños', cakeThemeLabel: 'Temática de la torta *',
+        addComboText: 'Agregar al Pedido', cancelText: 'Cancelar', checkoutTitle: '📋 Datos de Entrega',
+        nameLabel: 'Nombre Completo *', phoneLabel: 'Teléfono *', addressLabel: 'Dirección de Entrega *',
+        dateLabel: 'Fecha de Entrega *', notesLabel: 'Notas Adicionales', submitText: 'Enviar a WhatsApp',
+        closeCheckoutText: 'Cancelar', selectCityFirst: 'Selecciona tu ciudad primero', notEnoughAmount: 'Te faltan',
+        readyToOrder: '¡Listo para pedir!'
+    },
+    en: {
+        cityTitle: 'Select your city', continueText: 'Continue', mainTitle: '🎂 Choose your products',
+        combosTitle: '🎁 Predefined Combos', productsTitle: '🦴 Build Your Combo', cartTitle: '🛒 Your Order',
+        whatsappText: 'Order via WhatsApp', petNameLabel: 'Pet Name *', petAgeLabel: 'Age *',
+        petPhotoLabel: 'Pet Photo *', photoSmall: '*Required for birthday', cakeThemeLabel: 'Cake Theme *',
+        addComboText: 'Add to Order', cancelText: 'Cancel', checkoutTitle: '📋 Delivery Details',
+        nameLabel: 'Full Name *', phoneLabel: 'Phone *', addressLabel: 'Delivery Address *',
+        dateLabel: 'Delivery Date *', notesLabel: 'Additional Notes', submitText: 'Send to WhatsApp',
+        closeCheckoutText: 'Cancel', selectCityFirst: 'Select your city first', notEnoughAmount: 'You need',
+        readyToOrder: 'Ready to order!'
+    }
+};
+
+function init() {
+    products = HARDCODED_PRODUCTS;
+    renderProducts();
+    updateUI();
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    document.getElementById('deliveryDate').min = tomorrow.toISOString().split('T')[0];
+}
+
+function renderProducts() {
+    const combosGrid = document.getElementById('combosGrid');
+    const productsGrid = document.getElementById('productsGrid');
+    combosGrid.innerHTML = '';
+    productsGrid.innerHTML = '';
+
+    for (const [code, prod] of Object.entries(products)) {
+        if (prod.active !== 'SI') continue;
+        const html = `<div class="product-card" onclick="openCombo('${code}')">
+            <div class="product-emoji">${prod.emoji}</div>
+            <div class="product-name">${prod.name}</div>
+            <div class="product-price">$${prod.price.toFixed(2)}</div>
+            <div class="product-desc">${prod.desc}</div>
+        </div>`;
+        if (prod.type === 'combo') combosGrid.innerHTML += html;
+        else productsGrid.innerHTML += html;
+    }
+}
+
+function selectCity(city, min) {
+    selectedCity = city;
+    minAmount = min;
+    document.querySelectorAll('.city-option').forEach(el => el.classList.remove('selected'));
+    event.target.closest('.city-option').classList.add('selected');
+    document.getElementById('continueBtn').disabled = false;
+}
+
+function confirmCity() {
+    document.getElementById('cityModal').classList.remove('active');
+    document.getElementById('mainContainer').style.display = 'block';
+    const counter = document.getElementById('cityCounter');
+    counter.textContent = `📍 ${selectedCity} | 📦 Mínimo: $${minAmount.toFixed(2)}`;
+    counter.classList.add('active');
+}
+
+function openCombo(code) {
+    currentComboCode = code;
+    const prod = products[code];
+    document.getElementById('comboModal').classList.add('active');
+    document.getElementById('comboModalTitle').textContent = `${prod.emoji} ${prod.name}`;
+    const isBirthday = code.startsWith('C');
+    document.getElementById('birthdaySection').style.display = isBirthday ? 'block' : 'none';
+    document.getElementById('petName').value = '';
+    document.getElementById('petAge').value = '';
+    document.getElementById('petPhoto').value = '';
+    document.getElementById('cakeTheme').value = '';
+}
+
+function closeComboModal() {
+    document.getElementById('comboModal').classList.remove('active');
+}
+
+function addComboToCart() {
+    const code = currentComboCode;
+    const prod = products[code];
+    const petName = document.getElementById('petName').value.trim();
+    const petAge = document.getElementById('petAge').value;
+
+    if (!petName) {
+        alert(TRANSLATIONS[currentLang].petNameLabel);
+        return;
+    }
+
+    cart.push({
+        id: Date.now(), code: code, name: prod.name, price: prod.price, emoji: prod.emoji,
+        quantity: 1, petName: petName, petAge: petAge, isBirthday: code.startsWith('C'),
+        cakeTheme: document.getElementById('cakeTheme').value,
+        photoUploaded: document.getElementById('petPhoto').files.length > 0
+    });
+    closeComboModal();
+    updateCart();
+}
+
+function updateCart() {
+    const cartItems = document.getElementById('cartItems');
+    const cartTotal = document.getElementById('cartTotal');
+    const cartMessage = document.getElementById('cartMessage');
+
+    cartItems.innerHTML = '';
+    let total = 0;
+
+    cart.forEach(item => {
+        const subtotal = item.price * item.quantity;
+        total += subtotal;
+        let itemHtml = `<div class="cart-item"><div><strong>${item.emoji} ${item.name}</strong><br>
+            <small>${TRANSLATIONS[currentLang].petNameLabel}: ${item.petName}</small>`;
+        if (item.isBirthday) {
+            itemHtml += `<br><small>🎂 ${item.cakeTheme}${item.photoUploaded ? ' 📸' : ''}</small>`;
+        }
+        itemHtml += `</div><div><button onclick="removeFromCart(${item.id})" style="background: #ddd; border: none; padding: 5px 10px; cursor: pointer; border-radius: 5px;">❌</button>
+            <span style="margin: 0 10px; font-weight: bold;">$${subtotal.toFixed(2)}</span></div></div>`;
+        cartItems.innerHTML += itemHtml;
+    });
+
+    cartTotal.textContent = `Total: $${total.toFixed(2)}`;
+
+    let message = '', messageClass = '', enableWhatsapp = false;
+    if (!selectedCity) {
+        message = TRANSLATIONS[currentLang].selectCityFirst;
+        messageClass = 'error';
+    } else if (total < minAmount) {
+        const difference = (minAmount - total).toFixed(2);
+        message = `${TRANSLATIONS[currentLang].notEnoughAmount} $${difference}`;
+        messageClass = 'error';
+    } else {
+        message = TRANSLATIONS[currentLang].readyToOrder;
+        messageClass = 'success';
+        enableWhatsapp = true;
+    }
+
+    if (message) {
+        cartMessage.innerHTML = `<div class="cart-message ${messageClass}">${message}</div>`;
+    } else {
+        cartMessage.innerHTML = '';
+    }
+
+    document.getElementById('whatsappBtn').disabled = !enableWhatsapp;
+}
+
+function removeFromCart(id) {
+    cart = cart.filter(item => item.id !== id);
+    updateCart();
+}
+
+function sendToWhatsapp() {
+    if (!selectedCity) {
+        alert(TRANSLATIONS[currentLang].selectCityFirst);
+        return;
+    }
+    document.getElementById('checkoutModal').classList.add('active');
+}
+
+function closeCheckout() {
+    document.getElementById('checkoutModal').classList.remove('active');
+}
+
+function submitCheckout() {
+    const name = document.getElementById('customerName').value.trim();
+    const phone = document.getElementById('customerPhone').value.trim();
+    const address = document.getElementById('customerAddress').value.trim();
+    const date = document.getElementById('deliveryDate').value;
+    const notes = document.getElementById('customerNotes').value.trim();
+
+    if (!name || !phone || !address || !date) {
+        alert('Por favor completa todos los campos requeridos');
+        return;
+    }
+
+    let message = `🐾 PEDIDO KUKIPET\n\nCiudad: ${selectedCity}\nCliente: ${name}\nTeléfono: ${phone}\nDirección: ${address}\nFecha Entrega: ${date}\n`;
+    if (notes) message += `Notas: ${notes}\n`;
+    message += `\nPRODUCTOS:\n`;
+
+    let total = 0;
+    cart.forEach(item => {
+        const subtotal = item.price * item.quantity;
+        total += subtotal;
+        message += `\n• ${item.name} x${item.quantity} = $${subtotal.toFixed(2)}\n`;
+        if (item.petName) {
+            message += `  🐾 ${item.petName}`;
+            if (item.petAge) message += ` (${item.petAge} años)`;
+            message += `\n`;
+        }
+        if (item.cakeTheme) message += `  🎂 Temática: ${item.cakeTheme}\n`;
+        if (item.photoUploaded) message += `  📸 Con foto\n`;
+    });
+
+    message += `\nTOTAL: $${total.toFixed(2)}\n\n📸 IMPORTANTE: Adjunta las fotos en WhatsApp`;
+
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+
+    closeCheckout();
+    cart = [];
+    updateCart();
+}
+
+function toggleLanguage() {
+    currentLang = currentLang === 'es' ? 'en' : 'es';
+    updateUI();
+}
+
+function updateUI() {
+    Object.keys(TRANSLATIONS[currentLang]).forEach(key => {
+        const el = document.getElementById(key);
+        if (el) el.innerText = TRANSLATIONS[currentLang][key];
+    });
+    document.querySelector('.lang-toggle').innerText = currentLang === 'es' ? 'EN' : 'ES';
+}
+
+window.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>
