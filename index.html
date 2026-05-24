@@ -11,15 +11,7 @@
         @media (prefers-color-scheme: dark) { :root { --bg-light: #1a1c2c; --text-light: #eef2ff; --card-light: #2a2d3e; } }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: var(--bg-light); color: var(--text-light); overflow-x: hidden; }
         header { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); padding: 1.5rem 1rem 2rem; text-align: center; color: white; position: relative; }
-        .logo-simple {
-            font-size: 2.8rem;
-            font-weight: 800;
-            letter-spacing: 2px;
-            color: var(--accent);
-            text-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            margin-bottom: 1rem;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
+        .logo-simple { font-size: 2.8rem; font-weight: 800; letter-spacing: 2px; color: var(--accent); text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin-bottom: 1rem; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
         @media (max-width: 620px) { .logo-simple { font-size: 2rem; } }
         .lang-btn { position: absolute; top: 1rem; right: 1rem; background: white; color: var(--primary); border: 2px solid white; padding: 0.5rem 1.2rem; border-radius: 25px; cursor: pointer; font-weight: bold; z-index: 10; transition: 0.2s; }
         .lang-btn:hover { background: var(--primary); color: white; border-color: white; }
@@ -123,7 +115,7 @@
         </div>
     </div>
 
-    <!-- Modales (sin cambios) -->
+    <!-- Modales -->
     <div class="modal" id="cityModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -222,12 +214,11 @@
 
     <script>
         // ======================== CREDENCIALES DE SUPABASE ========================
-        // 🔴 REEMPLAZA ESTOS VALORES CON LOS TUYOS (los obtienes en Supabase → Project Settings → API)
         const SUPABASE_URL = 'https://rsamvitjesoqvxbykich.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_v3MNVdc9KKFJiLnTlHW51g_9ocm_8ds';
+        // Usamos la variable global que ya existe (window.supabase) para evitar redeclaración
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         // =========================================================================
-
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let PRODUCTOS = [
             { codigo: 'GA001', nombre: 'Doglletas', precio: 1.5, descripcion_es: 'Hígado de pollo, Avena', descripcion_en: 'Chicken liver, Oats' },
@@ -439,7 +430,7 @@
 
             try {
                 // 1. Guardar cliente
-                const { data: customer, error: customerError } = await supabase
+                const { data: customer, error: customerError } = await supabaseClient
                     .from('customers')
                     .insert({ name, phone, address, city: selectedCity })
                     .select()
@@ -447,7 +438,7 @@
                 if(customerError) throw customerError;
 
                 // 2. Guardar pedido
-                const { data: order, error: orderError } = await supabase
+                const { data: order, error: orderError } = await supabaseClient
                     .from('orders')
                     .insert({
                         customer_id: customer.id,
@@ -472,7 +463,7 @@
                     cake_theme: item.petData?.theme || null,
                     has_photo: item.petData?.hasPhoto || false
                 }));
-                const { error: itemsError } = await supabase
+                const { error: itemsError } = await supabaseClient
                     .from('order_items')
                     .insert(itemsToInsert);
                 if(itemsError) throw itemsError;
