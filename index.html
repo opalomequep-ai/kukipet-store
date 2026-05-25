@@ -216,7 +216,6 @@
         // ======================== CREDENCIALES DE SUPABASE ========================
         const SUPABASE_URL = 'https://rsamvitjesoqvxbykich.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_v3MNVdc9KKFJiLnTlHW51g_9ocm_8ds';
-        // Usamos la variable global que ya existe (window.supabase) para evitar redeclaración
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         // =========================================================================
 
@@ -410,12 +409,62 @@
             document.getElementById('checkoutModal').classList.add('active');
         }
 
+        // ========== NUEVA FUNCIÓN: ENVÍA WHATSAPP AL DUEÑO Y AL CLIENTE ==========
+        async function sendWhatsAppMessages(name, phone, address, deliveryDate, notes, total) {
+            const cityName = selectedCity.charAt(0).toUpperCase() + selectedCity.slice(1);
+            
+            // Mensaje para el DUEÑO (completo, todos los detalles)
+            let ownerMsg = '🐾 *NUEVO PEDIDO KUKIPET*%0A%0A';
+            ownerMsg += '*Ciudad:* ' + encodeURIComponent(cityName) + '%0A';
+            ownerMsg += '*Cliente:* ' + encodeURIComponent(name) + '%0A';
+            ownerMsg += '*Teléfono:* ' + encodeURIComponent(phone) + '%0A';
+            ownerMsg += '*Dirección:* ' + encodeURIComponent(address) + '%0A';
+            ownerMsg += '*Fecha entrega:* ' + encodeURIComponent(deliveryDate) + '%0A';
+            if(notes) ownerMsg += '*Notas:* ' + encodeURIComponent(notes) + '%0A';
+            ownerMsg += '%0A*PRODUCTOS:*%0A';
+            cart.forEach(i => {
+                ownerMsg += '%0A• ' + encodeURIComponent(i.nombre) + ' x' + (i.cantidad||1) + ' = $' + (i.precio*(i.cantidad||1)).toFixed(2);
+                if(i.petData) {
+                    ownerMsg += '%0A  🐾 ' + encodeURIComponent(i.petData.petName) + ' (' + encodeURIComponent(i.petData.petAge) + ')';
+                    if(i.petData.isBirthday) ownerMsg += '%0A  🎂 ' + encodeURIComponent(i.petData.theme);
+                    if(i.petData.hasPhoto) ownerMsg += '%0A  📸 Con foto';
+                }
+            });
+            ownerMsg += '%0A%0A*TOTAL: $' + total.toFixed(2) + '*';
+            if(cart.some(i=>i.petData?.hasPhoto)) ownerMsg += '%0A%0A📸 Adjunta las fotos en WhatsApp';
+
+            // Mensaje para el CLIENTE (confirmación amigable)
+            let clientMsg = '🐾 *¡Gracias por tu pedido en Kukipet!*%0A%0A';
+            clientMsg += 'Hemos recibido tu pedido y lo estaremos preparando con mucho cariño.%0A';
+            clientMsg += 'Te contactaremos a este número para coordinar la entrega.%0A%0A';
+            clientMsg += '*Resumen del pedido:*%0A';
+            clientMsg += '*Total:* $' + total.toFixed(2) + '%0A';
+            clientMsg += '*Fecha de entrega:* ' + encodeURIComponent(deliveryDate) + '%0A';
+            clientMsg += '%0A🐾 ¡Gracias por confiar en Kukipet! 🐾';
+
+            // Números (cambia OWNER_NUMBER por el número real del dueño)
+            const OWNER_NUMBER = '593994801133';  // ← REEMPLAZA POR EL NÚMERO DEL DUEÑO
+            const clientNumber = phone.replace(/\D/g, '');
+            const formattedClientNumber = clientNumber.startsWith('593') ? clientNumber : '593' + clientNumber;
+
+            // Abrir WhatsApp del dueño
+            window.open('https://wa.me/' + OWNER_NUMBER + '?text=' + ownerMsg, '_blank');
+            // Abrir WhatsApp del cliente después de medio segundo (evita bloqueos)
+            setTimeout(() => {
+                window.open('https://wa.me/' + formattedClientNumber + '?text=' + clientMsg, '_blank');
+            }, 500);
+        }
+        // =========================================================================
+
         async function submitCheckout(e) {
             e.preventDefault();
             if(!selectedCity) return false;
             const total = cart.reduce((s,i)=>s+(i.precio*i.cantidad),0);
             const minimum = cityMinimums[selectedCity];
-            if(total < minimum) { alert(currentLang==='es'?`Te faltan $${(minimum-total).toFixed(2)}`:`You need $${(minimum-total).toFixed(2)} more`); return false; }
+            if(total < minimum) {
+                alert(currentLang==='es'?`Te faltan $${(minimum-total).toFixed(2)}`:`You need $${(minimum-total).toFixed(2)} more`);
+                return false;
+            }
 
             const name = document.getElementById('owner-name').value.trim();
             const phone = document.getElementById('phone').value.trim();
@@ -429,7 +478,7 @@
             }
 
             try {
-                // 1. Guardar cliente
+                // 1. Guardar cliente en Supabase
                 const { data: customer, error: customerError } = await supabaseClient
                     .from('customers')
                     .insert({ name, phone, address, city: selectedCity })
@@ -437,7 +486,7 @@
                     .single();
                 if(customerError) throw customerError;
 
-                // 2. Guardar pedido
+                // 2. Guardar pedido en Supabase
                 const { data: order, error: orderError } = await supabaseClient
                     .from('orders')
                     .insert({
@@ -468,22 +517,8 @@
                     .insert(itemsToInsert);
                 if(itemsError) throw itemsError;
 
-                // 4. Construir mensaje de WhatsApp (exactamente igual que antes)
-                const cityName = selectedCity.charAt(0).toUpperCase()+selectedCity.slice(1);
-                let msg = '🐾 *PEDIDO KUKIPET*%0A%0A*Ciudad:* '+encodeURIComponent(cityName)+'%0A*Cliente:* '+encodeURIComponent(name)+'%0A*Teléfono:* '+encodeURIComponent(phone)+'%0A*Dirección:* '+encodeURIComponent(address)+'%0A*Fecha:* '+encodeURIComponent(deliveryDate)+'%0A';
-                if(notes) msg += '*Notas:* '+encodeURIComponent(notes)+'%0A';
-                msg += '%0A*PRODUCTOS:*%0A';
-                cart.forEach(i => {
-                    msg += '%0A• '+encodeURIComponent(i.nombre)+' x'+(i.cantidad||1)+' = $'+(i.precio*(i.cantidad||1)).toFixed(2);
-                    if(i.petData) {
-                        msg += '%0A  🐾 '+encodeURIComponent(i.petData.petName)+' ('+encodeURIComponent(i.petData.petAge)+')';
-                        if(i.petData.isBirthday) msg += '%0A  🎂 '+encodeURIComponent(i.petData.theme);
-                        if(i.petData.hasPhoto) msg += '%0A  📸 Con foto';
-                    }
-                });
-                msg += '%0A%0A*TOTAL: $'+total.toFixed(2)+'*';
-                if(cart.some(i=>i.petData?.hasPhoto)) msg += '%0A%0A📸 Adjunta las fotos en WhatsApp';
-                window.open('https://wa.me/593994801133?text='+msg, '_blank');
+                // 4. Enviar WhatsApp al dueño y al cliente
+                await sendWhatsAppMessages(name, phone, address, deliveryDate, notes, total);
 
                 // Limpiar carrito y cerrar modal
                 cart = [];
