@@ -271,15 +271,26 @@
 
         // Escuchar cambios en tiempo real en los precios
         function subscribeToSupabaseUpdates() {
-            supabaseClient
-                .channel('precios-changes')
-                .on('postgres_changes',
-                    { event: '*', schema: 'public', table: 'precios' },
-                    (payload) => {
-                        syncPricesFromSupabase();
-                    }
-                )
-                .subscribe();
+            try {
+                console.log('🔌 Conectando a Supabase Realtime...');
+                const subscription = supabaseClient
+                    .channel('precios-channel')
+                    .on('postgres_changes',
+                        { event: '*', schema: 'public', table: 'precios' },
+                        (payload) => {
+                            console.log('🔄 Cambio detectado en precios:', payload);
+                            syncPricesFromSupabase();
+                        }
+                    )
+                    .subscribe((status) => {
+                        console.log('📡 Estado de Realtime:', status);
+                        if (status === 'SUBSCRIBED') {
+                            console.log('✅ Conectado a Realtime - Los precios se actualizarán automáticamente');
+                        }
+                    });
+            } catch (err) {
+                console.error('❌ Error al conectar Realtime:', err);
+            }
         }
 
         let currentLang = 'es';
