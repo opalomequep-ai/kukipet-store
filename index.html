@@ -260,7 +260,9 @@
 
                 // Actualizar precios en PRODUCTOS
                 precios.forEach(p => {
-                    const producto = PRODUCTOS.find(prod => prod.codigo?.trim() === String(p.codigo).trim());
+                    const producto = PRODUCTOS.find(prod =>
+                        prod.codigo?.trim().toLowerCase() === String(p.codigo).trim().toLowerCase()
+                    );
                     if (producto) {
                         const precioAnterior = producto.precio;
                         producto.precio = parseFloat(p.precio);
@@ -273,7 +275,9 @@
 
                 // Actualizar precios en COMBOS
                 precios.forEach(p => {
-                    const combo = COMBOS.find(c => c.codigo?.trim() === String(p.codigo).trim());
+                    const combo = COMBOS.find(c =>
+                        c.codigo?.trim().toLowerCase() === String(p.codigo).trim().toLowerCase()
+                    );
                     if (combo) {
                         const precioAnterior = combo.precio;
                         combo.precio = parseFloat(p.precio);
