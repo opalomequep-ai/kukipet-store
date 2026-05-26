@@ -499,6 +499,47 @@
             document.getElementById('checkoutModal').classList.add('active');
         }
 
+        // ========== GUARDAR PEDIDO EN GOOGLE SHEETS ==========
+        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwVmXR6_DpR-uTVkVsQFzBRsAoq83AuHKPuoi_qifr5yPEhvQNved0r0rWpMVhcWPV4yg/exec';
+
+        async function saveOrderToGoogleSheets(name, phone, address, city, deliveryDate, notes, total, cartItems) {
+            try {
+                // Preparar datos de productos
+                const productos = cartItems.map(item => ({
+                    codigo: item.codigo || 'COMBO',
+                    nombre: item.nombre,
+                    cantidad: item.cantidad || 1,
+                    precio: item.precio
+                }));
+
+                const payload = {
+                    cliente: name,
+                    telefono: phone,
+                    direccion: address,
+                    ciudad: city,
+                    fechaEntrega: deliveryDate,
+                    total: total,
+                    productos: productos,
+                    notas: notes
+                };
+
+                const response = await fetch(GOOGLE_SHEETS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload),
+                    headers: {'Content-Type': 'application/json'}
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    console.log('✅ Pedido guardado en Google Sheets');
+                } else {
+                    console.error('❌ Error en Google Sheets:', result.error);
+                }
+            } catch (err) {
+                console.error('Error guardando en Google Sheets:', err);
+            }
+        }
+
         // ========== NUEVA FUNCIÓN: ENVÍA WHATSAPP AL DUEÑO Y AL CLIENTE ==========
         async function sendWhatsAppMessages(name, phone, address, deliveryDate, notes, total) {
             const cityName = selectedCity.charAt(0).toUpperCase() + selectedCity.slice(1);
@@ -609,6 +650,9 @@
 
                 // 4. Enviar WhatsApp al dueño y al cliente
                 await sendWhatsAppMessages(name, phone, address, deliveryDate, notes, total);
+
+                // 5. Guardar en Google Sheets
+                await saveOrderToGoogleSheets(name, phone, address, selectedCity, deliveryDate, notes, total, cart);
 
                 // Limpiar carrito y cerrar modal
                 cart = [];
