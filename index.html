@@ -220,20 +220,22 @@
         // =========================================================================
 
         let PRODUCTOS = [
-            { codigo: 'GA001', nombre: 'Doglletas', precio: 1.5, descripcion_es: 'Hígado de pollo, Avena', descripcion_en: 'Chicken liver, Oats' },
-            { codigo: 'PZ001', nombre: 'Petzza', precio: 5.0, descripcion_es: 'Proteína de pollo, res, verduras, harina de avena', descripcion_en: 'Chicken protein, beef, vegetables, oat flour' },
-            { codigo: 'PZ002', nombre: 'MiniPetzza', precio: 1.0, descripcion_es: 'Proteína de pollo, res, verduras, harina de avena', descripcion_en: 'Chicken protein, beef, vegetables, oat flour' },
-            { codigo: 'PE001', nombre: 'Petlados pollo', precio: 1.5, descripcion_es: 'Pollo y zanahoria', descripcion_en: 'Chicken and carrot' },
-            { codigo: 'PE002', nombre: 'Petlados patitas', precio: 1.75, descripcion_es: 'Pollo, hígado y zanahoria', descripcion_en: 'Chicken, liver and carrot' },
-            { codigo: 'TO001', nombre: 'Torta Cumple 17 cm x17 cm', precio: 15.0, descripcion_es: 'Dos tipos de carne, harina de avena y verduras, recubiertas de papa', descripcion_en: 'Two types of meat, oat flour and vegetables, potato topping' },
-            { codigo: 'TO003', nombre: 'Torta mini', precio: 8.0, descripcion_es: 'Dos tipos de carne, harina de avena y verduras, recubiertas de papa', descripcion_en: 'Two types of meat, oat flour and vegetables, potato topping' },
-            { codigo: 'TO002', nombre: 'Torta Cumple 30 cm x30 cm', precio: 30.0, descripcion_es: 'Dos tipos de carne, harina de avena y verduras, recubiertas de papa', descripcion_en: 'Two types of meat, oat flour and vegetables, potato topping' }
+            { codigo: 'ga001', nombre: 'Doglletas', precio: 1.5, descripcion_es: 'Hígado de pollo, Avena', descripcion_en: 'Chicken liver, Oats' },
+            { codigo: 'pz001', nombre: 'Petzza', precio: 5.0, descripcion_es: 'Proteína de pollo, res, verduras, harina de avena', descripcion_en: 'Chicken protein, beef, vegetables, oat flour' },
+            { codigo: 'pz002', nombre: 'MiniPetzza', precio: 1.0, descripcion_es: 'Proteína de pollo, res, verduras, harina de avena', descripcion_en: 'Chicken protein, beef, vegetables, oat flour' },
+            { codigo: 'pe001', nombre: 'Petlados pollo', precio: 1.5, descripcion_es: 'Pollo y zanahoria', descripcion_en: 'Chicken and carrot' },
+            { codigo: 'pe002', nombre: 'Petlados patitas', precio: 1.75, descripcion_es: 'Pollo, hígado y zanahoria', descripcion_en: 'Chicken, liver and carrot' },
+            { codigo: 'pe003', nombre: 'Petlados higado', precio: 1.75, descripcion_es: 'Hígado y zanahoria', descripcion_en: 'Liver and carrot' },
+            { codigo: 'gu001', nombre: 'Gomipet', precio: 2.0, descripcion_es: 'Gomitas de colágeno', descripcion_en: 'Collagen gummies' },
+            { codigo: 'to001', nombre: 'Torta Cumple 17 cm x17 cm', precio: 15.0, descripcion_es: 'Dos tipos de carne, harina de avena y verduras, recubiertas de papa', descripcion_en: 'Two types of meat, oat flour and vegetables, potato topping' },
+            { codigo: 'to002', nombre: 'Torta Cumple 30 cm x30 cm', precio: 30.0, descripcion_es: 'Dos tipos de carne, harina de avena y verduras, recubiertas de papa', descripcion_en: 'Two types of meat, oat flour and vegetables, potato topping' },
+            { codigo: 'to003', nombre: 'Torta mini', precio: 8.0, descripcion_es: 'Dos tipos de carne, harina de avena y verduras, recubiertas de papa', descripcion_en: 'Two types of meat, oat flour and vegetables, potato topping' }
         ];
         let COMBOS = [
-            { codigo: 'C001', nombre: 'Cumplelamidos', precio: 22.0, descripcion_es: '1 Minitorta, 7 Petlados de patitas, 12 Doglletas, 2 Minipetzzas y 1 juguete', descripcion_en: '1 Mini cake, 7 Paw petlados, 12 Dog biscuits, 2 Mini pizzas and 1 toy' },
-            { codigo: 'C002', nombre: 'Bokado Real', precio: 20.0, descripcion_es: '1 Minitorta, 3 Cupcake, 7 Petlados de patita, 1 Minipetzza, 12 Doglletas', descripcion_en: '1 Mini cake, 3 Cupcakes, 7 Paw petlados, 1 Mini pizza, 12 Dog biscuits' },
-            { codigo: 'C003', nombre: 'Kukifest', precio: 25.0, descripcion_es: '1 Torta de 17 cm en forma de corazón, redondas y de pata, 4 Cupcakes,14 Petlados de patita, 15 Doglletas', descripcion_en: '1 17cm heart-shaped cake, round and paw shaped, 4 Cupcakes, 14 Paw petlados, 15 Dog biscuits' },
-            { codigo: 'C004', nombre: 'Antojo perruno', precio: 12.0, descripcion_es: '1 Petzza grande, 12 Doglletas,7 Petlados de patita, 6 Gomitas colágeno', descripcion_en: '1 Large Petzza, 12 Dog biscuits, 7 Paw petlados, 6 Collagen gummies' }
+            { codigo: 'c001', nombre: 'Cumplelamidos', precio: 22.0, descripcion_es: '1 Minitorta, 7 Petlados de patitas, 12 Doglletas, 2 Minipetzzas y 1 juguete', descripcion_en: '1 Mini cake, 7 Paw petlados, 12 Dog biscuits, 2 Mini pizzas and 1 toy' },
+            { codigo: 'c002', nombre: 'Bokado Real', precio: 20.0, descripcion_es: '1 Minitorta, 3 Cupcake, 7 Petlados de patita, 1 Minipetzza, 12 Doglletas', descripcion_en: '1 Mini cake, 3 Cupcakes, 7 Paw petlados, 1 Mini pizza, 12 Dog biscuits' },
+            { codigo: 'c003', nombre: 'Kukifest', precio: 25.0, descripcion_es: '1 Torta de 17 cm en forma de corazón, redondas y de pata, 4 Cupcakes, 14 Petlados de patita, 15 Doglletas', descripcion_en: '1 17cm heart-shaped cake, round and paw shaped, 4 Cupcakes, 14 Paw petlados, 15 Dog biscuits' },
+            { codigo: 'c004', nombre: 'Antojo perruno', precio: 12.0, descripcion_es: '1 Petzza grande, 12 Doglletas, 7 Petlados de patita, 6 Gomitas colágeno', descripcion_en: '1 Large Petzza, 12 Dog biscuits, 7 Paw petlados, 6 Collagen gummies' }
         ];
 
         // ========== SINCRONIZAR SOLO LOS PRECIOS DESDE SUPABASE ==========
