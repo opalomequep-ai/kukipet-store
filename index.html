@@ -5,13 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>Kukipet - Pastelería para Mascotas</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Pacifico&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root { --bg-light: #FFF9F0; --text-light: #2D3142; --card-light: white; --primary: #4ECDC4; --primary-dark: #3BAAA3; --accent: #E07A5F; }
         @media (prefers-color-scheme: dark) { :root { --bg-light: #1a1c2c; --text-light: #eef2ff; --card-light: #2a2d3e; } }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: var(--bg-light); color: var(--text-light); overflow-x: hidden; }
+        body { font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-light); color: var(--text-light); overflow-x: hidden; }
         header { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); padding: 1.5rem 1rem 2rem; text-align: center; color: white; position: relative; }
-        .logo-simple { font-size: 2.8rem; font-weight: 800; letter-spacing: 2px; color: var(--accent); text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin-bottom: 1rem; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+        .logo-simple { font-size: 2.8rem; font-weight: 400; letter-spacing: 1px; color: var(--accent); text-shadow: 0 2px 6px rgba(0,0,0,0.15); margin-bottom: 1rem; font-family: 'Pacifico', cursive; }
         @media (max-width: 620px) { .logo-simple { font-size: 2rem; } }
         .lang-btn { position: absolute; top: 1rem; right: 1rem; background: white; color: var(--primary); border: 2px solid white; padding: 0.5rem 1.2rem; border-radius: 25px; cursor: pointer; font-weight: bold; z-index: 10; transition: 0.2s; }
         .lang-btn:hover { background: var(--primary); color: white; border-color: white; }
@@ -226,7 +229,6 @@
             { codigo: 'pe001', nombre: 'Petlados pollo', precio: 1.5, descripcion_es: 'Pollo y zanahoria', descripcion_en: 'Chicken and carrot' },
             { codigo: 'pe002', nombre: 'Petlados patitas', precio: 1.75, descripcion_es: 'Pollo, hígado y zanahoria', descripcion_en: 'Chicken, liver and carrot' },
             { codigo: 'pe003', nombre: 'Petlados higado', precio: 1.75, descripcion_es: 'Hígado y zanahoria', descripcion_en: 'Liver and carrot' },
-            { codigo: 'gu001', nombre: 'Gomipet', precio: 2.0, descripcion_es: 'Gomitas de colágeno', descripcion_en: 'Collagen gummies' },
             { codigo: 'to001', nombre: 'Torta Cumple 17 cm x17 cm', precio: 15.0, descripcion_es: 'Dos tipos de carne, harina de avena y verduras, recubiertas de papa', descripcion_en: 'Two types of meat, oat flour and vegetables, potato topping' },
             { codigo: 'to002', nombre: 'Torta Cumple 30 cm x30 cm', precio: 30.0, descripcion_es: 'Dos tipos de carne, harina de avena y verduras, recubiertas de papa', descripcion_en: 'Two types of meat, oat flour and vegetables, potato topping' },
             { codigo: 'to003', nombre: 'Torta mini', precio: 8.0, descripcion_es: 'Dos tipos de carne, harina de avena y verduras, recubiertas de papa', descripcion_en: 'Two types of meat, oat flour and vegetables, potato topping' }
