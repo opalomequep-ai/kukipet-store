@@ -7,11 +7,11 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root { --bg-light: #FFF9F0; --text-light: #2D3142; --card-light: white; --primary: #4ECDC4; --primary-dark: #3BAAA3; --accent: #E07A5F; }
+        :root { --bg-light: #FFF9F0; --text-light: #2D3142; --card-light: white; --primary: #4ECDC4; --primary-dark: #3BAAA3; --accent: #C4785A; }
         @media (prefers-color-scheme: dark) { :root { --bg-light: #1a1c2c; --text-light: #eef2ff; --card-light: #2a2d3e; } }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: var(--bg-light); color: var(--text-light); overflow-x: hidden; }
         header { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); padding: 1.5rem 1rem 2rem; text-align: center; color: white; position: relative; }
-        .logo-simple { font-size: 2.8rem; font-weight: 800; letter-spacing: 2px; color: var(--accent); text-shadow: 0 2px 8px rgba(0,0,0,0.2); margin-bottom: 1rem; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+        .logo-simple { font-size: 2.8rem; font-weight: 800; letter-spacing: 2px; color: white; text-shadow: 0 2px 8px rgba(0,0,0,0.15); margin-bottom: 1rem; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
         @media (max-width: 620px) { .logo-simple { font-size: 2rem; } }
         .lang-btn { position: absolute; top: 1rem; right: 1rem; background: white; color: var(--primary); border: 2px solid white; padding: 0.5rem 1.2rem; border-radius: 25px; cursor: pointer; font-weight: bold; z-index: 10; transition: 0.2s; }
         .lang-btn:hover { background: var(--primary); color: white; border-color: white; }
@@ -76,7 +76,7 @@
                     <h2 id="combos-title">🎉 Combos Predefinidos</h2>
                     <div class="combos-grid" id="combos"></div>
                     <div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #f0f0f0;">
-                        <button id="custom-combo-btn" onclick="startCustomCombo()" style="background: linear-gradient(135deg, #E07A5F 0%, #D96A4F 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 40px; font-weight: bold; cursor: pointer;">🦴 ¿Prefieres armar tu propio combo?</button>
+                        <button id="custom-combo-btn" onclick="startCustomCombo()" style="background: linear-gradient(135deg, #C4785A 0%, #B06848 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 40px; font-weight: bold; cursor: pointer;">🦴 ¿Prefieres armar tu propio combo?</button>
                     </div>
                 </div>
 
@@ -226,7 +226,6 @@
             { codigo: 'pe001', nombre: 'Petlados pollo', precio: 1.5, descripcion_es: 'Pollo y zanahoria', descripcion_en: 'Chicken and carrot' },
             { codigo: 'pe002', nombre: 'Petlados patitas', precio: 1.75, descripcion_es: 'Pollo, hígado y zanahoria', descripcion_en: 'Chicken, liver and carrot' },
             { codigo: 'pe003', nombre: 'Petlados higado', precio: 1.75, descripcion_es: 'Hígado y zanahoria', descripcion_en: 'Liver and carrot' },
-            { codigo: 'gu001', nombre: 'Gomipet', precio: 2.0, descripcion_es: 'Gomitas de colágeno', descripcion_en: 'Collagen gummies' },
             { codigo: 'to001', nombre: 'Torta Cumple 17 cm x17 cm', precio: 15.0, descripcion_es: 'Dos tipos de carne, harina de avena y verduras, recubiertas de papa', descripcion_en: 'Two types of meat, oat flour and vegetables, potato topping' },
             { codigo: 'to002', nombre: 'Torta Cumple 30 cm x30 cm', precio: 30.0, descripcion_es: 'Dos tipos de carne, harina de avena y verduras, recubiertas de papa', descripcion_en: 'Two types of meat, oat flour and vegetables, potato topping' },
             { codigo: 'to003', nombre: 'Torta mini', precio: 8.0, descripcion_es: 'Dos tipos de carne, harina de avena y verduras, recubiertas de papa', descripcion_en: 'Two types of meat, oat flour and vegetables, potato topping' }
@@ -369,7 +368,7 @@
                 card.innerHTML = `<div style="font-size:3rem;margin-bottom:0.5rem">${escapeHtml(getEmoji(c.nombre))}</div>
                     <div style="font-weight:bold;margin-bottom:0.5rem">${escapeHtml(c.nombre)}</div>
                     <div style="font-size:0.85rem;color:#666;margin-bottom:1rem">${escapeHtml(desc)}</div>
-                    <div style="font-size:1.8rem;font-weight:bold;color:#E07A5F;margin-bottom:1rem">$${c.precio.toFixed(2)}</div>
+                    <div style="font-size:1.8rem;font-weight:bold;color:#C4785A;margin-bottom:1rem">$${c.precio.toFixed(2)}</div>
                     <button class="btn-add" type="button">${currentLang==='es'?'Seleccionar':'Select'}</button>`;
                 container.appendChild(card);
             });
@@ -384,7 +383,7 @@
                 row.className = 'product-row';
                 row.innerHTML = `<div style="font-size:2.5rem;width:60px;text-align:center">${escapeHtml(getEmoji(p.nombre))}</div>
                     <div style="flex:1"><h4>${escapeHtml(p.nombre)}</h4><p style="font-size:0.85rem;color:#666">${escapeHtml(desc)}</p></div>
-                    <div style="font-size:1.2rem;font-weight:bold;color:#E07A5F">$${p.precio.toFixed(2)}</div>
+                    <div style="font-size:1.2rem;font-weight:bold;color:#C4785A">$${p.precio.toFixed(2)}</div>
                     <div class="qty-controls" style="display:flex;gap:0.5rem">
                         <button class="qty-btn" data-code="${p.codigo}" data-delta="-1" style="width:35px;height:35px;border:none;background:#4ECDC4;color:white;border-radius:50%;font-size:1.3rem;cursor:pointer">−</button>
                         <div class="qty-num" id="qty-${p.codigo}" style="width:40px;text-align:center;font-weight:bold">0</div>
@@ -477,7 +476,7 @@
                 if(item.petData) { infoHtml += `<div style="font-size:0.75rem;color:#666">🐾 ${escapeHtml(item.petData.petName)} (${escapeHtml(item.petData.petAge)})`; if(item.petData.isBirthday) infoHtml += `<br>🎂 ${escapeHtml(item.petData.theme)}`; infoHtml += `</div>`; }
                 else infoHtml += `<div style="font-size:0.75rem;color:#666">x${item.cantidad}</div>`;
                 infoHtml += `</div>`;
-                const priceHtml = `<div style="font-weight:bold;color:#E07A5F;">$${(item.precio*item.cantidad).toFixed(2)}</div>`;
+                const priceHtml = `<div style="font-weight:bold;color:#C4785A;">$${(item.precio*item.cantidad).toFixed(2)}</div>`;
                 const removeBtn = `<button class="cart-item-remove" onclick="removeCartItem(${idx})">✖ ${currentLang==='es'?'Eliminar':'Remove'}</button>`;
                 itemDiv.innerHTML = infoHtml + priceHtml + removeBtn;
                 itemsList.appendChild(itemDiv);
