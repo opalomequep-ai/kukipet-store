@@ -650,6 +650,12 @@
         // Sincronizar precios desde Supabase
         syncPricesFromSupabase();
         subscribeToSupabaseUpdates();
+
+        // Sincronizar precios cada 10 segundos (fallback si Realtime no funciona)
+        setInterval(() => {
+            syncPricesFromSupabase();
+        }, 10000);
+
         renderCombos();
         renderProductos();
         loadCartFromStorage();
