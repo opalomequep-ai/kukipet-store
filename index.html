@@ -219,64 +219,64 @@
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         // =========================================================================
 
-        let PRODUCTOS = [];
-        let COMBOS = [];
-        let supabaseReady = false;
+        let PRODUCTOS = [
+            { codigo: 'GA001', nombre: 'Doglletas', precio: 1.5, descripcion_es: 'Hígado de pollo, Avena', descripcion_en: 'Chicken liver, Oats' },
+            { codigo: 'PZ001', nombre: 'Petzza', precio: 5.0, descripcion_es: 'Proteína de pollo, res, verduras, harina de avena', descripcion_en: 'Chicken protein, beef, vegetables, oat flour' },
+            { codigo: 'PZ002', nombre: 'MiniPetzza', precio: 1.0, descripcion_es: 'Proteína de pollo, res, verduras, harina de avena', descripcion_en: 'Chicken protein, beef, vegetables, oat flour' },
+            { codigo: 'PE001', nombre: 'Petlados pollo', precio: 1.5, descripcion_es: 'Pollo y zanahoria', descripcion_en: 'Chicken and carrot' },
+            { codigo: 'PE002', nombre: 'Petlados patitas', precio: 1.75, descripcion_es: 'Pollo, hígado y zanahoria', descripcion_en: 'Chicken, liver and carrot' },
+            { codigo: 'TO001', nombre: 'Torta Cumple 17 cm x17 cm', precio: 15.0, descripcion_es: 'Dos tipos de carne, harina de avena y verduras, recubiertas de papa', descripcion_en: 'Two types of meat, oat flour and vegetables, potato topping' },
+            { codigo: 'TO003', nombre: 'Torta mini', precio: 8.0, descripcion_es: 'Dos tipos de carne, harina de avena y verduras, recubiertas de papa', descripcion_en: 'Two types of meat, oat flour and vegetables, potato topping' },
+            { codigo: 'TO002', nombre: 'Torta Cumple 30 cm x30 cm', precio: 30.0, descripcion_es: 'Dos tipos de carne, harina de avena y verduras, recubiertas de papa', descripcion_en: 'Two types of meat, oat flour and vegetables, potato topping' }
+        ];
+        let COMBOS = [
+            { codigo: 'C001', nombre: 'Cumplelamidos', precio: 22.0, descripcion_es: '1 Minitorta, 7 Petlados de patitas, 12 Doglletas, 2 Minipetzzas y 1 juguete', descripcion_en: '1 Mini cake, 7 Paw petlados, 12 Dog biscuits, 2 Mini pizzas and 1 toy' },
+            { codigo: 'C002', nombre: 'Bokado Real', precio: 20.0, descripcion_es: '1 Minitorta, 3 Cupcake, 7 Petlados de patita, 1 Minipetzza, 12 Doglletas', descripcion_en: '1 Mini cake, 3 Cupcakes, 7 Paw petlados, 1 Mini pizza, 12 Dog biscuits' },
+            { codigo: 'C003', nombre: 'Kukifest', precio: 25.0, descripcion_es: '1 Torta de 17 cm en forma de corazón, redondas y de pata, 4 Cupcakes,14 Petlados de patita, 15 Doglletas', descripcion_en: '1 17cm heart-shaped cake, round and paw shaped, 4 Cupcakes, 14 Paw petlados, 15 Dog biscuits' },
+            { codigo: 'C004', nombre: 'Antojo perruno', precio: 12.0, descripcion_es: '1 Petzza grande, 12 Doglletas,7 Petlados de patita, 6 Gomitas colágeno', descripcion_en: '1 Large Petzza, 12 Dog biscuits, 7 Paw petlados, 6 Collagen gummies' }
+        ];
 
-        // ========== CARGAR DATOS DE SUPABASE EN TIEMPO REAL ==========
-        async function loadProductsFromSupabase() {
+        // ========== SINCRONIZAR SOLO LOS PRECIOS DESDE SUPABASE ==========
+        async function syncPricesFromSupabase() {
             try {
-                // Cargar productos de la tabla 'precios'
-                const { data: productos, error } = await supabaseClient
+                const { data: precios, error } = await supabaseClient
                     .from('precios')
-                    .select('*')
-                    .order('categoria');
+                    .select('codigo, precio');
 
                 if (error) throw error;
 
-                PRODUCTOS = productos.map(p => ({
-                    codigo: p.codigo,
-                    nombre: p.producto,
-                    precio: parseFloat(p.precio),
-                    descripcion_es: p.descripcion || '',
-                    descripcion_en: p.descripcion || '',
-                    categoria: p.categoria
-                }));
+                // Actualizar precios en PRODUCTOS
+                precios.forEach(p => {
+                    const producto = PRODUCTOS.find(prod => prod.codigo === p.codigo);
+                    if (producto) {
+                        producto.precio = parseFloat(p.precio);
+                    }
+                });
 
-                // Cargar combos de la tabla 'combos' (si existe)
-                const { data: combos, error: combosError } = await supabaseClient
-                    .from('combos')
-                    .select('*')
-                    .order('codigo');
+                // Actualizar precios en COMBOS
+                precios.forEach(p => {
+                    const combo = COMBOS.find(c => c.codigo === p.codigo);
+                    if (combo) {
+                        combo.precio = parseFloat(p.precio);
+                    }
+                });
 
-                if (!combosError && combos) {
-                    COMBOS = combos.map(c => ({
-                        codigo: c.codigo,
-                        nombre: c.nombre,
-                        precio: parseFloat(c.precio),
-                        descripcion_es: c.descripcion_es || c.descripcion || '',
-                        descripcion_en: c.descripcion_en || c.descripcion || ''
-                    }));
-                }
-
-                supabaseReady = true;
                 renderCombos();
                 renderProductos();
-                showToast('✅ Precios actualizados desde Supabase');
+                updateCart();
             } catch (err) {
-                console.error('Error cargando productos de Supabase:', err);
-                showToast('⚠️ Error al cargar precios');
+                console.log('Info: Precios desde Supabase (primer intento):', err.message);
             }
         }
 
-        // Escuchar cambios en tiempo real en la tabla 'precios'
+        // Escuchar cambios en tiempo real en los precios
         function subscribeToSupabaseUpdates() {
             supabaseClient
                 .channel('precios-changes')
                 .on('postgres_changes',
                     { event: '*', schema: 'public', table: 'precios' },
                     (payload) => {
-                        loadProductsFromSupabase();
+                        syncPricesFromSupabase();
                     }
                 )
                 .subscribe();
@@ -636,9 +636,11 @@
         document.getElementById('petForm').addEventListener('submit', submitPet);
         document.getElementById('checkoutForm').addEventListener('submit', submitCheckout);
 
-        // Cargar datos de Supabase
-        loadProductsFromSupabase();
+        // Sincronizar precios desde Supabase
+        syncPricesFromSupabase();
         subscribeToSupabaseUpdates();
+        renderCombos();
+        renderProductos();
         loadCartFromStorage();
         updateLanguageUI();
     </script>
