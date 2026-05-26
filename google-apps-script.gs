@@ -76,48 +76,38 @@ function syncToSupabase() {
     const codigos = productos.map(p => p.codigo).join(', ');
     Logger.log('📋 Códigos: ' + codigos);
 
-    // ACTUALIZAR CADA PRODUCTO INDIVIDUALMENTE (UPSERT)
-    for (let i = 0; i < productos.length; i++) {
-      const prod = productos[i];
+    // BORRAR TODOS LOS DATOS ANTIGUOS
+    Logger.log('🗑️ Borrando datos anteriores...');
+    const deleteResponse = UrlFetchApp.fetch(SUPABASE_URL + '/rest/v1/' + TABLE_NAME, {
+      method: 'DELETE',
+      headers: {'apikey': SUPABASE_ANON_KEY},
+      muteHttpExceptions: true
+    });
+    Logger.log('🗑️ Delete response: ' + deleteResponse.getResponseCode());
 
-      const response = UrlFetchApp.fetch(
-        SUPABASE_URL + '/rest/v1/' + TABLE_NAME + '?codigo=eq.' + encodeURIComponent(prod.codigo),
-        {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': SUPABASE_ANON_KEY,
-            'Prefer': 'return=minimal'
-          },
-          payload: JSON.stringify(prod),
-          muteHttpExceptions: true
-        }
-      );
+    // INSERTAR TODOS LOS NUEVOS DATOS DE UNA VEZ
+    Logger.log('📤 Insertando ' + productos.length + ' productos...');
+    const insertResponse = UrlFetchApp.fetch(SUPABASE_URL + '/rest/v1/' + TABLE_NAME, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+        'Prefer': 'return=minimal'
+      },
+      payload: JSON.stringify(productos),
+      muteHttpExceptions: true
+    });
 
-      const code = response.getResponseCode();
-      if (code !== 204 && code !== 200) {
-        // Si no existe, insertar
-        const insertResponse = UrlFetchApp.fetch(
-          SUPABASE_URL + '/rest/v1/' + TABLE_NAME,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'apikey': SUPABASE_ANON_KEY,
-              'Prefer': 'return=minimal'
-            },
-            payload: JSON.stringify(prod),
-            muteHttpExceptions: true
-          }
-        );
+    const insertCode = insertResponse.getResponseCode();
+    Logger.log('📤 Insert response: ' + insertCode);
 
-        if (insertResponse.getResponseCode() !== 201) {
-          Logger.log('⚠️ Error al insertar ' + prod.codigo + ': ' + insertResponse.getResponseCode());
-        }
-      }
+    if (insertCode === 201 || insertCode === 200) {
+      Logger.log('✅ Sincronización exitosa: ' + productos.length + ' productos insertados');
+    } else {
+      const errorBody = insertResponse.getContentText();
+      Logger.log('❌ Error al insertar: ' + insertCode);
+      Logger.log('Respuesta: ' + errorBody);
     }
-
-    Logger.log('✅ Sincronización completada: ' + productos.length + ' productos');
 
   } catch (err) {
     Logger.log('❌ Error: ' + err);
