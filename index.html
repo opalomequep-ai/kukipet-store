@@ -243,29 +243,56 @@
                     .from('precios')
                     .select('codigo, precio');
 
-                if (error) throw error;
+                if (error) {
+                    console.error('❌ Error al traer precios:', error);
+                    return;
+                }
+
+                if (!precios || precios.length === 0) {
+                    console.warn('⚠️ No hay precios en Supabase');
+                    return;
+                }
+
+                console.log('📊 Precios desde Supabase:', precios.length);
+
+                let productosActualizados = 0;
+                let combosActualizados = 0;
 
                 // Actualizar precios en PRODUCTOS
                 precios.forEach(p => {
-                    const producto = PRODUCTOS.find(prod => prod.codigo === p.codigo);
+                    const producto = PRODUCTOS.find(prod => prod.codigo?.trim() === String(p.codigo).trim());
                     if (producto) {
+                        const precioAnterior = producto.precio;
                         producto.precio = parseFloat(p.precio);
+                        if (precioAnterior !== producto.precio) {
+                            console.log('💰 Producto actualizado:', producto.nombre, precioAnterior, '→', producto.precio);
+                            productosActualizados++;
+                        }
                     }
                 });
 
                 // Actualizar precios en COMBOS
                 precios.forEach(p => {
-                    const combo = COMBOS.find(c => c.codigo === p.codigo);
+                    const combo = COMBOS.find(c => c.codigo?.trim() === String(p.codigo).trim());
                     if (combo) {
+                        const precioAnterior = combo.precio;
                         combo.precio = parseFloat(p.precio);
+                        if (precioAnterior !== combo.precio) {
+                            console.log('🎉 Combo actualizado:', combo.nombre, precioAnterior, '→', combo.precio);
+                            combosActualizados++;
+                        }
                     }
                 });
 
-                renderCombos();
-                renderProductos();
-                updateCart();
+                if (productosActualizados > 0 || combosActualizados > 0) {
+                    console.log('✅ Sincronizado:', productosActualizados, 'productos,', combosActualizados, 'combos');
+                    renderCombos();
+                    renderProductos();
+                    updateCart();
+                }
+
             } catch (err) {
-                console.log('Info: Precios desde Supabase (primer intento):', err.message);
+                console.error('❌ Error en syncPricesFromSupabase:', err);
             }
         }
 
