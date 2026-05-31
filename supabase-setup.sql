@@ -119,3 +119,47 @@ CREATE POLICY "Allow public insert orders" ON orders
 
 CREATE POLICY "Allow public insert order_items" ON order_items
   FOR INSERT WITH CHECK (true);
+
+-- =====================================================
+-- 6. TABLA DE VISITAS AL SITIO (contador de visitas)
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS site_visits (
+  id BIGSERIAL PRIMARY KEY,
+  session_id TEXT,
+  visited_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_site_visits_at ON site_visits(visited_at);
+CREATE INDEX IF NOT EXISTS idx_site_visits_session ON site_visits(session_id);
+
+ALTER TABLE site_visits ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow public insert visits" ON site_visits
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Allow public read visits" ON site_visits
+  FOR SELECT USING (true);
+
+-- =====================================================
+-- 7. TABLA DE CLICKS (mapa de calor de interacciones)
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS click_events (
+  id BIGSERIAL PRIMARY KEY,
+  session_id TEXT,
+  element_name TEXT NOT NULL,
+  element_type TEXT,
+  clicked_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_click_events_at ON click_events(clicked_at);
+CREATE INDEX IF NOT EXISTS idx_click_events_name ON click_events(element_name);
+
+ALTER TABLE click_events ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow public insert clicks" ON click_events
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Allow public read clicks" ON click_events
+  FOR SELECT USING (true);

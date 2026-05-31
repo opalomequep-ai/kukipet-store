@@ -52,6 +52,19 @@
         @media (max-width: 480px) { .combos-grid { grid-template-columns: 1fr; } }
         .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #4ECDC4; color: white; padding: 12px 24px; border-radius: 40px; font-weight: bold; z-index: 1100; animation: fadeOut 3s forwards; }
         @keyframes fadeOut { 0% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
+        /* Admin Panel */
+        #admin-fab { display: none; position: fixed; bottom: 24px; right: 24px; width: 52px; height: 52px; background: linear-gradient(135deg, #2D3142 0%, #4a4e6b 100%); color: white; border: none; border-radius: 50%; font-size: 1.3rem; cursor: pointer; z-index: 9000; box-shadow: 0 4px 16px rgba(0,0,0,0.35); transition: transform 0.2s; align-items: center; justify-content: center; }
+        #admin-fab:hover { transform: scale(1.1); }
+        #admin-panel { display: none; position: fixed; top: 0; right: 0; width: 360px; max-width: 100vw; height: 100vh; background: #1a1c2c; color: #eef2ff; z-index: 9999; padding: 1.5rem; overflow-y: auto; box-shadow: -4px 0 24px rgba(0,0,0,0.4); transition: transform 0.3s ease; transform: translateX(100%); }
+        #admin-panel.open { transform: translateX(0); }
+        .admin-stat-card { background: #2a2d3e; border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 0.8rem; }
+        .admin-stat-num { font-size: 2rem; font-weight: bold; color: #4ECDC4; }
+        .admin-stat-label { font-size: 0.8rem; color: #888; margin-bottom: 4px; }
+        .admin-click-item { display: flex; justify-content: space-between; align-items: center; padding: 0.55rem 0; border-bottom: 1px solid #2a2d3e; font-size: 0.85rem; gap: 0.5rem; }
+        .admin-click-bar-wrap { flex: 1; }
+        .admin-click-bar { height: 5px; background: #4ECDC4; border-radius: 3px; margin-top: 3px; min-width: 4px; }
+        .admin-close-btn { background: none; border: none; color: #888; font-size: 1.5rem; cursor: pointer; line-height: 1; padding: 0; }
+        .admin-refresh-btn { background: #2a2d3e; border: none; color: #4ECDC4; padding: 0.4rem 0.9rem; border-radius: 20px; cursor: pointer; font-size: 0.8rem; }
     </style>
 </head>
 <body>
@@ -112,6 +125,43 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Botón flotante Admin (solo visible al dueño) -->
+    <button id="admin-fab" title="Panel de estadísticas" onclick="toggleAdminPanel()">📊</button>
+
+    <!-- Panel Admin -->
+    <div id="admin-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2rem;">
+            <h2 style="color:#4ECDC4; margin:0; font-size:1.2rem;">📊 Panel de Estadísticas</h2>
+            <div style="display:flex;gap:0.5rem;align-items:center;">
+                <button class="admin-refresh-btn" onclick="loadAdminStats()">↻ Actualizar</button>
+                <button class="admin-close-btn" onclick="toggleAdminPanel()">✕</button>
+            </div>
+        </div>
+        <div id="admin-loading" style="text-align:center;padding:2rem;color:#888;">Cargando estadísticas…</div>
+        <div id="admin-content" style="display:none;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:1rem;">
+                <div class="admin-stat-card">
+                    <div class="admin-stat-label">Visitas totales</div>
+                    <div class="admin-stat-num" id="stat-total">–</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-label">Visitas hoy</div>
+                    <div class="admin-stat-num" id="stat-today">–</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-label">Visitantes únicos</div>
+                    <div class="admin-stat-num" id="stat-unique">–</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-label">Esta semana</div>
+                    <div class="admin-stat-num" id="stat-week">–</div>
+                </div>
+            </div>
+            <h3 style="color:#4ECDC4; margin:1.2rem 0 0.6rem; font-size:1rem;">🖱️ Más clickeados</h3>
+            <div id="top-clicks"></div>
         </div>
     </div>
 
@@ -217,6 +267,111 @@
         const SUPABASE_URL = 'https://rsamvitjesoqvxbykich.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_v3MNVdc9KKFJiLnTlHW51g_9ocm_8ds';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // =========================================================================
+
+        // ======================== ANALYTICS & PANEL ADMIN ========================
+        const ADMIN_SECRET = 'kukipet2024';
+        let adminPanelOpen = false;
+
+        function getSessionId() {
+            let sid = sessionStorage.getItem('kukipet_session');
+            if (!sid) {
+                sid = 'sess_' + Math.random().toString(36).slice(2, 11) + Date.now().toString(36);
+                sessionStorage.setItem('kukipet_session', sid);
+            }
+            return sid;
+        }
+
+        async function trackVisit() {
+            try {
+                await supabaseClient.from('site_visits').insert({ session_id: getSessionId() });
+            } catch(e) {}
+        }
+
+        async function trackClick(elementName, elementType) {
+            try {
+                await supabaseClient.from('click_events').insert({
+                    session_id: getSessionId(),
+                    element_name: elementName,
+                    element_type: elementType || 'button'
+                });
+            } catch(e) {}
+        }
+
+        function checkAdminAccess() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('admin') === ADMIN_SECRET) {
+                sessionStorage.setItem('kukipet_admin', '1');
+            }
+            return sessionStorage.getItem('kukipet_admin') === '1';
+        }
+
+        function toggleAdminPanel() {
+            const panel = document.getElementById('admin-panel');
+            adminPanelOpen = !adminPanelOpen;
+            if (adminPanelOpen) {
+                panel.style.display = 'block';
+                requestAnimationFrame(() => panel.classList.add('open'));
+                loadAdminStats();
+            } else {
+                panel.classList.remove('open');
+                setTimeout(() => { panel.style.display = 'none'; }, 320);
+            }
+        }
+
+        async function loadAdminStats() {
+            document.getElementById('admin-loading').style.display = 'block';
+            document.getElementById('admin-content').style.display = 'none';
+            try {
+                const { data: visits } = await supabaseClient
+                    .from('site_visits')
+                    .select('session_id, visited_at');
+
+                const now = new Date();
+                const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                const startOfWeek = new Date(startOfDay);
+                startOfWeek.setDate(startOfDay.getDate() - startOfDay.getDay());
+
+                const totalVisits = visits?.length || 0;
+                const todayVisits = visits?.filter(v => new Date(v.visited_at) >= startOfDay).length || 0;
+                const weekVisits = visits?.filter(v => new Date(v.visited_at) >= startOfWeek).length || 0;
+                const uniqueSessions = new Set(visits?.map(v => v.session_id)).size;
+
+                const { data: clicks } = await supabaseClient
+                    .from('click_events')
+                    .select('element_name')
+                    .limit(2000);
+
+                const clickCounts = {};
+                clicks?.forEach(c => { clickCounts[c.element_name] = (clickCounts[c.element_name] || 0) + 1; });
+                const topClicks = Object.entries(clickCounts).sort((a, b) => b[1] - a[1]).slice(0, 12);
+                const maxClicks = topClicks[0]?.[1] || 1;
+
+                document.getElementById('stat-total').textContent = totalVisits;
+                document.getElementById('stat-today').textContent = todayVisits;
+                document.getElementById('stat-week').textContent = weekVisits;
+                document.getElementById('stat-unique').textContent = uniqueSessions;
+
+                const topClicksEl = document.getElementById('top-clicks');
+                if (topClicks.length === 0) {
+                    topClicksEl.innerHTML = '<div style="color:#888;font-size:0.85rem;padding:0.5rem 0;">No hay clicks registrados aún.</div>';
+                } else {
+                    topClicksEl.innerHTML = topClicks.map(([name, count], i) => `
+                        <div class="admin-click-item">
+                            <div class="admin-click-bar-wrap">
+                                <div style="color:#eef2ff;">${i+1}. ${name}</div>
+                                <div class="admin-click-bar" style="width:${Math.max(4, Math.round((count/maxClicks)*100))}%"></div>
+                            </div>
+                            <div style="color:#4ECDC4;font-weight:bold;min-width:30px;text-align:right;">${count}</div>
+                        </div>`).join('');
+                }
+
+                document.getElementById('admin-loading').style.display = 'none';
+                document.getElementById('admin-content').style.display = 'block';
+            } catch(e) {
+                document.getElementById('admin-loading').textContent = '❌ Error al cargar estadísticas. Verifica que las tablas existan en Supabase.';
+            }
+        }
         // =========================================================================
 
         let PRODUCTOS = [
@@ -420,6 +575,7 @@
 
         function addCustomToCart() {
             if(customCart.length === 0) return;
+            trackClick('Agregar combo personalizado al carrito', 'button');
             customCart.forEach(item => cart.push({ ...item }));
             customCart = [];
             PRODUCTOS.forEach(p => { const el = document.getElementById('qty-'+p.codigo); if(el) el.textContent = '0'; });
@@ -432,6 +588,7 @@
         }
 
         function startCustomCombo() {
+            trackClick('Armar combo personalizado', 'button');
             if(!selectedCity) { document.getElementById('cityModal').classList.add('active'); window.fromCustomize = true; return; }
             showProductsList();
         }
@@ -444,6 +601,7 @@
         function confirmCity() {
             const city = document.getElementById('city-select').value;
             if(!city) return;
+            trackClick('Ciudad seleccionada: ' + city.charAt(0).toUpperCase() + city.slice(1), 'city-select');
             selectedCity = city;
             const minimum = cityMinimums[city];
             const cityName = city.charAt(0).toUpperCase() + city.slice(1);
@@ -456,7 +614,7 @@
             if(window.fromCheckout) { window.fromCheckout = false; const total = cart.reduce((s,i)=>s+(i.precio*i.cantidad),0); if(total >= minimum) document.getElementById('checkoutModal').classList.add('active'); else alert((currentLang==='es'?`Te faltan $${(minimum-total).toFixed(2)} para el mínimo de ${cityName}`:`You need $${(minimum-total).toFixed(2)} more for the minimum in ${cityName}`)); }
         }
 
-        function openPetModal(code) { currentCombo = COMBOS.find(c => c.codigo === code); if(currentCombo) document.getElementById('petModal').classList.add('active'); }
+        function openPetModal(code) { currentCombo = COMBOS.find(c => c.codigo === code); if(currentCombo) { trackClick('Combo: ' + currentCombo.nombre, 'combo-card'); document.getElementById('petModal').classList.add('active'); } }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
         function toggleTheme() { const isBirthday = document.getElementById('is-birthday').value === 'yes'; document.getElementById('theme-group').style.display = isBirthday ? 'block' : 'none'; document.getElementById('cake-theme').required = isBirthday; document.getElementById('pet-age').required = isBirthday; document.getElementById('pet-photo').required = isBirthday; }
         function previewPhoto() { const file = document.getElementById('pet-photo').files[0]; const preview = document.getElementById('photo-preview'); if(file && file.type.startsWith('image/')) { const reader = new FileReader(); reader.onload = e => { preview.innerHTML = '<img src="'+e.target.result+'">'; }; reader.readAsDataURL(file); } else preview.innerHTML = ''; }
@@ -490,6 +648,7 @@
 
         function openCheckoutModal() {
             if(cart.length===0) return;
+            trackClick('Pedir por WhatsApp', 'checkout-button');
             if(!selectedCity) { window.fromCheckout = true; document.getElementById('cityModal').classList.add('active'); return; }
             const total = cart.reduce((s,i)=>s+(i.precio*i.cantidad),0);
             const minimum = cityMinimums[selectedCity];
@@ -668,7 +827,7 @@
 
         function showToast(message) { const toast = document.createElement('div'); toast.className = 'toast'; toast.textContent = message; document.body.appendChild(toast); setTimeout(()=>toast.remove(),3000); }
 
-        function toggleLang() { currentLang = currentLang==='es' ? 'en' : 'es'; updateLanguageUI(); renderCombos(); renderProductos(); updateCart(); }
+        function toggleLang() { currentLang = currentLang==='es' ? 'en' : 'es'; trackClick('Cambio de idioma: ' + currentLang.toUpperCase(), 'lang-toggle'); updateLanguageUI(); renderCombos(); renderProductos(); updateCart(); }
 
         function updateLanguageUI() {
             const t = translations[currentLang];
@@ -736,6 +895,13 @@
         renderProductos();
         loadCartFromStorage();
         updateLanguageUI();
+
+        // Tracking y acceso admin
+        trackVisit();
+        if (checkAdminAccess()) {
+            const fab = document.getElementById('admin-fab');
+            fab.style.display = 'flex';
+        }
     </script>
 </body>
 </html>
