@@ -71,6 +71,9 @@
         @media (max-width:968px) { .mobile-cart-bar { display:block; } body { padding-bottom:4rem; } }
         .price-visible { color:#A83C25 !important; font-weight:800; letter-spacing:.01em; }
         @media (prefers-color-scheme: dark) { .price-visible { color:#FFD0C2 !important; } }
+        .hat-dog-icon { position:relative; display:inline-block; width:2.8rem; height:2.8rem; }
+        .hat-dog-icon .dog { position:absolute; left:0; bottom:0; font-size:2.5rem; }
+        .hat-dog-icon .hat { position:absolute; left:1.05rem; top:-.35rem; font-size:1.35rem; transform:rotate(-12deg); z-index:2; }
     </style>
 </head>
 <body>
@@ -542,6 +545,13 @@
             });
         }
 
+        function getProductVisual(name) {
+            if (name === 'Gorro cumpleañero' || name === 'Gorro de invitados') {
+                return '<span class="hat-dog-icon" aria-label="Perro con gorro de cumpleaños"><span class="dog">🐶</span><span class="hat">🎉</span></span>';
+            }
+            return escapeHtml(getEmoji(name));
+        }
+
         function renderProductos() {
             const container = document.getElementById('productos');
             container.innerHTML = '';
@@ -549,7 +559,7 @@
                 const desc = getDescripcion(p, currentLang);
                 const row = document.createElement('div');
                 row.className = 'product-row';
-                row.innerHTML = `<div style="font-size:2.5rem;width:60px;text-align:center">${escapeHtml(getEmoji(p.nombre))}</div>
+                row.innerHTML = `<div style="font-size:2.5rem;width:60px;text-align:center">${getProductVisual(p.nombre)}</div>
                     <div style="flex:1"><h4>${escapeHtml(p.nombre)}</h4><p style="font-size:0.85rem;color:#666">${escapeHtml(desc)}</p></div>
                     <div class="price-visible" style="font-size:1.2rem">$${p.precio.toFixed(2)}</div>
                     <div class="qty-controls" style="display:flex;gap:0.5rem">
