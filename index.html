@@ -65,6 +65,10 @@
         .admin-click-bar { height: 5px; background: #4ECDC4; border-radius: 3px; margin-top: 3px; min-width: 4px; }
         .admin-close-btn { background: none; border: none; color: #888; font-size: 1.5rem; cursor: pointer; line-height: 1; padding: 0; }
         .admin-refresh-btn { background: #2a2d3e; border: none; color: #4ECDC4; padding: 0.4rem 0.9rem; border-radius: 20px; cursor: pointer; font-size: 0.8rem; }
+        .quick-actions { display:flex; gap:.7rem; justify-content:center; flex-wrap:wrap; margin-top:1rem; }
+        .quick-actions a { background:rgba(255,255,255,.96); color:#2D3142; text-decoration:none; padding:.65rem 1rem; border-radius:999px; font-weight:700; font-size:.9rem; box-shadow:0 2px 8px rgba(0,0,0,.12); }
+        .mobile-cart-bar { display:none; position:fixed; left:1rem; right:1rem; bottom:1rem; z-index:8500; background:#25D366; color:white; border:0; border-radius:999px; padding:.9rem 1rem; font-weight:800; box-shadow:0 5px 18px rgba(0,0,0,.22); }
+        @media (max-width:968px) { .mobile-cart-bar { display:block; } body { padding-bottom:4rem; } }
     </style>
 </head>
 <body>
@@ -73,6 +77,11 @@
         <div class="logo-simple" id="logo-simple">KUKIPET</div>
         <h1 id="header-title">Pastelería para Mascotas</h1>
         <p id="header-subtitle">🌿 Productos 100% Naturales · Sin conservantes ni químicos</p>
+        <nav class="quick-actions" aria-label="Accesos rápidos">
+            <a href="#combos-section">🎉 Ver combos</a>
+            <a href="#custom-section" onclick="startCustomCombo(); return false;">🦴 Armar mi combo</a>
+            <a href="#cart-summary" onclick="document.querySelector('.cart').scrollIntoView({behavior:'smooth'}); return false;">🛒 Ver pedido</a>
+        </nav>
     </header>
 
     <div class="container">
@@ -86,7 +95,7 @@
         <div class="main-grid">
             <div class="products-area">
                 <div class="section" id="combos-section">
-                    <h2 id="combos-title">🎉 Combos Predefinidos</h2>
+                    <h2 id="combos-title">🎉 Combos</h2>
                     <div class="combos-grid" id="combos"></div>
                     <div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #f0f0f0;">
                         <button id="custom-combo-btn" onclick="startCustomCombo()" style="background: linear-gradient(135deg, #E07A5F 0%, #D96A4F 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 40px; font-weight: bold; cursor: pointer;">🦴 ¿Prefieres armar tu propio combo?</button>
@@ -127,6 +136,8 @@
             </div>
         </div>
     </div>
+
+    <button id="mobile-cart-bar" class="mobile-cart-bar" onclick="document.querySelector('.cart').scrollIntoView({behavior:'smooth'});">🛒 Ver mi pedido</button>
 
     <!-- Botón flotante Admin (solo visible al dueño) -->
     <button id="admin-fab" title="Panel de estadísticas" onclick="toggleAdminPanel()">📊</button>
@@ -177,7 +188,6 @@
                     <option value="" id="city-default-option">-- Elige tu ciudad --</option>
                     <option value="cuenca">🏙️ Cuenca</option>
                     <option value="azogues">🏘️ Azogues</option>
-                    <option value="gualaceo">🏞️ Gualaceo</option>
                 </select>
             </div>
             <div id="min-display" style="display: none; margin: 2rem 0; padding: 1rem; background: #FFF3CD; border-radius: 16px; text-align: center;">
@@ -236,7 +246,7 @@
                     <h3 style="color: #4ECDC4;" id="footer-restrictions-title">Restricciones</h3>
                     <ul style="list-style: none; line-height: 2;">
                         <li id="footer-rest-1">📦 Pedido mínimo según ciudad</li>
-                        <li id="footer-rest-2">🚚 Entregas: Cuenca, Azogues, Gualaceo</li>
+                        <li id="footer-rest-2">🚚 Entregas: Cuenca y Azogues</li>
                         <li id="footer-rest-3">⏰ Pedidos con 24h de anticipación</li>
                         <li id="footer-rest-4">❄️ Refrigerados: consumir en 48 horas</li>
                         <li id="footer-rest-5">⚠️ Sin devoluciones en perecederos</li>
@@ -379,8 +389,7 @@
             { codigo: 'pz001', nombre: 'Petzza', precio: 5.0, descripcion_es: 'Proteína de pollo, res, verduras, harina de avena', descripcion_en: 'Chicken protein, beef, vegetables, oat flour' },
             { codigo: 'pz002', nombre: 'MiniPetzza', precio: 1.0, descripcion_es: 'Proteína de pollo, res, verduras, harina de avena', descripcion_en: 'Chicken protein, beef, vegetables, oat flour' },
             { codigo: 'pe001', nombre: 'Petlados pollo', precio: 1.5, descripcion_es: 'Pollo y zanahoria', descripcion_en: 'Chicken and carrot' },
-            { codigo: 'pe002', nombre: 'Petlados patitas', precio: 1.75, descripcion_es: 'Pollo, hígado y zanahoria', descripcion_en: 'Chicken, liver and carrot' },
-            { codigo: 'pe003', nombre: 'Petlados higado', precio: 1.75, descripcion_es: 'Hígado y zanahoria', descripcion_en: 'Liver and carrot' },
+            { codigo: 'cu001', nombre: 'Cupcakes', precio: 1.25, descripcion_es: 'Cupcakes naturales para mascotas', descripcion_en: 'Natural cupcakes for pets' },
             { codigo: 'to001', nombre: 'Torta Cumple 17 cm x17 cm', precio: 15.0, descripcion_es: 'Dos tipos de carne, harina de avena y verduras, recubiertas de papa', descripcion_en: 'Two types of meat, oat flour and vegetables, potato topping' },
             { codigo: 'to002', nombre: 'Torta Cumple 30 cm x30 cm', precio: 30.0, descripcion_es: 'Dos tipos de carne, harina de avena y verduras, recubiertas de papa', descripcion_en: 'Two types of meat, oat flour and vegetables, potato topping' },
             { codigo: 'to003', nombre: 'Torta mini', precio: 8.0, descripcion_es: 'Dos tipos de carne, harina de avena y verduras, recubiertas de papa', descripcion_en: 'Two types of meat, oat flour and vegetables, potato topping' }
@@ -484,18 +493,18 @@
         let cart = [];
         let currentCombo = null;
         let customCart = [];
-        let cityMinimums = { cuenca: 15, azogues: 25, gualaceo: 25 };
+        let cityMinimums = { cuenca: 15, azogues: 25 };
         let selectedCity = '';
 
         const translations = {
             es: { header_title:'Pastelería para Mascotas', header_subtitle:'🌿 Productos 100% Naturales · Sin conservantes ni químicos', combos_title:'🎉 Combos Predefinidos', custom_combo_btn:'🦴 ¿Prefieres armar tu propio combo?', custom_title:'🦴 Arma Tu Combo', back_btn:'← Regresar', custom_subtotal:'Subtotal:', cancel_btn:'Cancelar', add_to_cart_btn:'Agregar al Pedido', cart_title:'🛒 Tu Pedido', cart_empty:'Agrega productos a tu combo', total_label:'Total:', checkout_btn:'💬 Pedir por WhatsApp', empty_cart_btn:'🗑️ Vaciar carrito', city_title:'📍 ¿Dónde harás tu pedido?', city_default:'-- Elige tu ciudad --', min_label:'Mínimo de compra:', confirm_btn:'Continuar', cancel_btn_modal:'Cancelar', pet_title:'Datos de tu Mascota', pet_name_label:'Nombre de la mascota *', pet_age_label:'Edad (obligatorio si es cumpleaños)', pet_photo_label:'Foto (obligatorio si es cumpleaños)', is_birthday_label:'¿Es para cumpleaños?', theme_label:'Temática de la torta *', pet_submit:'Agregar al Pedido', checkout_title:'Datos de Entrega', owner_name_label:'Nombre completo *', phone_label:'Teléfono *', address_label:'Dirección de entrega *', delivery_date_label:'Fecha de entrega *', notes_label:'Notas adicionales', checkout_submit:'Enviar Pedido', restrictions_title:'Restricciones', contact_title:'Contacto', lang_toggle:'EN', checkout_ready:'✅ ¡Listo para pedir!',
-                footer_rest1:'📦 Pedido mínimo según ciudad', footer_rest2:'🚚 Entregas: Cuenca, Azogues, Gualaceo', footer_rest3:'⏰ Pedidos con 24h de anticipación', footer_rest4:'❄️ Refrigerados: consumir en 48 horas', footer_rest5:'⚠️ Sin devoluciones en perecederos',
+                footer_rest1:'📦 Pedido mínimo según ciudad', footer_rest2:'🚚 Entregas: Cuenca y Azogues', footer_rest3:'⏰ Pedidos con 24h de anticipación', footer_rest4:'❄️ Refrigerados: consumir en 48 horas', footer_rest5:'⚠️ Sin devoluciones en perecederos',
                 footer_privacy_title:'Privacidad', footer_priv1:'🔒 Tu información está protegida', footer_priv2:'📱 Datos usados solo para pedidos', footer_priv3:'🚫 No compartimos tu información', footer_location:'📍 Cuenca, Ecuador',
-                city_cuenca:'🏙️ Cuenca', city_azogues:'🏘️ Azogues', city_gualaceo:'🏞️ Gualaceo', select_label:'Seleccionar', notice_city_first:'📍 Selecciona tu ciudad primero' },
+                city_cuenca:'🏙️ Cuenca', city_azogues:'🏘️ Azogues', select_label:'Seleccionar', notice_city_first:'📍 Selecciona tu ciudad primero' },
             en: { header_title:'Pet Bakery', header_subtitle:'🌿 100% Natural Products · No preservatives or chemicals', combos_title:'🎉 Predefined Combos', custom_combo_btn:'🦴 Would you like to build your own combo?', custom_title:'🦴 Build Your Combo', back_btn:'← Go back', custom_subtotal:'Subtotal:', cancel_btn:'Cancel', add_to_cart_btn:'Add to Order', cart_title:'🛒 Your Order', cart_empty:'Add products to your combo', total_label:'Total:', checkout_btn:'💬 Order via WhatsApp', empty_cart_btn:'🗑️ Empty cart', city_title:'📍 Where will you place your order?', city_default:'-- Choose your city --', min_label:'Minimum purchase:', confirm_btn:'Continue', cancel_btn_modal:'Cancel', pet_title:'Your Pet\'s Details', pet_name_label:'Pet name *', pet_age_label:'Age (required if birthday)', pet_photo_label:'Photo (required if birthday)', is_birthday_label:'Is it for a birthday?', theme_label:'Cake theme *', pet_submit:'Add to Order', checkout_title:'Delivery Details', owner_name_label:'Full name *', phone_label:'Phone *', address_label:'Delivery address *', delivery_date_label:'Delivery date *', notes_label:'Additional notes', checkout_submit:'Send Order', restrictions_title:'Restrictions', contact_title:'Contact', lang_toggle:'ES', checkout_ready:'✅ Ready to order!',
-                footer_rest1:'📦 Minimum order per city', footer_rest2:'🚚 Deliveries: Cuenca, Azogues, Gualaceo', footer_rest3:'⏰ Orders 24h in advance', footer_rest4:'❄️ Refrigerated: consume within 48h', footer_rest5:'⚠️ No returns on perishables',
+                footer_rest1:'📦 Minimum order per city', footer_rest2:'🚚 Deliveries: Cuenca and Azogues', footer_rest3:'⏰ Orders 24h in advance', footer_rest4:'❄️ Refrigerated: consume within 48h', footer_rest5:'⚠️ No returns on perishables',
                 footer_privacy_title:'Privacy', footer_priv1:'🔒 Your information is protected', footer_priv2:'📱 Data used only for orders', footer_priv3:'🚫 We do not share your information', footer_location:'📍 Cuenca, Ecuador',
-                city_cuenca:'🏙️ Cuenca', city_azogues:'🏘️ Azogues', city_gualaceo:'🏞️ Gualaceo', select_label:'Select', notice_city_first:'📍 Select your city first' }
+                city_cuenca:'🏙️ Cuenca', city_azogues:'🏘️ Azogues', select_label:'Select', notice_city_first:'📍 Select your city first' }
         };
 
         function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => m==='&'?'&amp;': m==='<'?'&lt;':'&gt;'); }
@@ -622,8 +631,16 @@
 
         function removeCartItem(index) { cart.splice(index,1); updateCart(); showToast(currentLang==='es'?'Producto eliminado':'Product removed'); }
         function emptyCart() { if(cart.length===0) return; if(confirm(currentLang==='es'?'¿Estás seguro de vaciar todo el carrito?':'Are you sure you want to empty the cart?')) { cart = []; updateCart(); showToast(currentLang==='es'?'Carrito vaciado':'Cart emptied'); } }
+        function updateMobileCartBar() {
+            const bar = document.getElementById('mobile-cart-bar');
+            if (!bar) return;
+            const total = cart.reduce((s,i)=>s+(i.precio*i.cantidad),0);
+            bar.textContent = cart.length ? '🛒 Ver pedido · $' + total.toFixed(2) : '🛒 Ver mi pedido';
+        }
+
         function updateCart() {
             const total = cart.reduce((s,i)=>s+(i.precio*i.cantidad),0);
+            updateMobileCartBar();
             if(cart.length===0) { document.getElementById('cart-items').style.display = 'block'; document.getElementById('cart-summary').style.display = 'none'; localStorage.removeItem('kukipet_cart'); return; }
             localStorage.setItem('kukipet_cart', JSON.stringify(cart));
             document.getElementById('cart-items').style.display = 'none'; document.getElementById('cart-summary').style.display = 'block';
