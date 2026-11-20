@@ -74,6 +74,7 @@
         .hat-dog-icon { position:relative; display:inline-block; width:2.8rem; height:2.8rem; }
         .hat-dog-icon .dog { position:absolute; left:0; bottom:0; font-size:2.5rem; }
         .hat-dog-icon .hat { position:absolute; left:.78rem; top:-.6rem; font-size:1.55rem; transform:rotate(-8deg); z-index:2; }
+        .hat-dog-svg { width:2.8rem; height:2.8rem; display:inline-block; vertical-align:middle; }
     </style>
 </head>
 <body>
@@ -547,7 +548,7 @@
 
         function getProductVisual(name) {
             if (name === 'Gorro cumpleañero' || name === 'Gorro de invitados') {
-                return '<span class="hat-dog-icon" aria-label="Perro con gorro de cumpleaños"><span class="dog">🐶</span><span class="hat">🎉</span></span>';
+                return '<svg class="hat-dog-svg" viewBox="0 0 80 80" role="img" aria-label="Perro feliz con gorro de cumpleaños"><path fill="#B87545" d="M16 48c0-18 10-30 24-30s24 12 24 30v15H16z"/><circle cx="31" cy="47" r="3" fill="#2D3142"/><circle cx="49" cy="47" r="3" fill="#2D3142"/><ellipse cx="40" cy="57" rx="8" ry="5" fill="#2D3142"/><path fill="#E07A5F" d="M23 25L40 4l17 21z"/><path fill="#FFD166" d="M31 15l9-11 9 11z"/><circle cx="40" cy="4" r="4" fill="#4ECDC4"/></svg>';
             }
             return escapeHtml(getEmoji(name));
         }
