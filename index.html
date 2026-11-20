@@ -512,7 +512,7 @@
         };
 
         function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => m==='&'?'&amp;': m==='<'?'&lt;':'&gt;'); }
-        const emojis = { 'Gorro cumpleañero':'🐶🎉','Gorro de invitados':'🐱🎉', 'Doglletas':'🦴','Petzza':'🍕','Petlados pollo':'🍦','Petlados patitas':'🐾','Torta':'🎂','Cumplelamidos':'🎉','Bokado':'👑','Kukifest':'🎊','Antojo':'🎁' };
+        const emojis = { 'Gorro cumpleañero':'🐶🎉','Gorro de invitados':'🐶🎉', 'Doglletas':'🦴','Petzza':'🍕','Petlados pollo':'🍦','Petlados patitas':'🐾','Torta':'🎂','Cumplelamidos':'🎉','Bokado':'👑','Kukifest':'🎊','Antojo':'🎁' };
         function getEmoji(name) { for(let k in emojis) if(name.includes(k)) return emojis[k]; return '🐾'; }
         function getDescripcion(item, lang) { return (lang==='en' && item.descripcion_en) ? item.descripcion_en : item.descripcion_es; }
 
