@@ -69,6 +69,8 @@
         .quick-actions a { background:rgba(255,255,255,.96); color:#2D3142; text-decoration:none; padding:.65rem 1rem; border-radius:999px; font-weight:700; font-size:.9rem; box-shadow:0 2px 8px rgba(0,0,0,.12); }
         .mobile-cart-bar { display:none; position:fixed; left:1rem; right:1rem; bottom:1rem; z-index:8500; background:#25D366; color:white; border:0; border-radius:999px; padding:.9rem 1rem; font-weight:800; box-shadow:0 5px 18px rgba(0,0,0,.22); }
         @media (max-width:968px) { .mobile-cart-bar { display:block; } body { padding-bottom:4rem; } }
+        .price-visible { color:#A83C25 !important; font-weight:800; letter-spacing:.01em; }
+        @media (prefers-color-scheme: dark) { .price-visible { color:#FFD0C2 !important; } }
     </style>
 </head>
 <body>
@@ -547,7 +549,7 @@
                 row.className = 'product-row';
                 row.innerHTML = `<div style="font-size:2.5rem;width:60px;text-align:center">${escapeHtml(getEmoji(p.nombre))}</div>
                     <div style="flex:1"><h4>${escapeHtml(p.nombre)}</h4><p style="font-size:0.85rem;color:#666">${escapeHtml(desc)}</p></div>
-                    <div style="font-size:1.2rem;font-weight:bold;color:#E07A5F">$${p.precio.toFixed(2)}</div>
+                    <div class="price-visible" style="font-size:1.2rem">$${p.precio.toFixed(2)}</div>
                     <div class="qty-controls" style="display:flex;gap:0.5rem">
                         <button class="qty-btn" data-code="${p.codigo}" data-delta="-1" style="width:35px;height:35px;border:none;background:#4ECDC4;color:white;border-radius:50%;font-size:1.3rem;cursor:pointer">−</button>
                         <div class="qty-num" id="qty-${p.codigo}" style="width:40px;text-align:center;font-weight:bold">0</div>
@@ -651,7 +653,7 @@
                 if(item.petData) { infoHtml += `<div style="font-size:0.75rem;color:#666">🐾 ${escapeHtml(item.petData.petName)} (${escapeHtml(item.petData.petAge)})`; if(item.petData.isBirthday) infoHtml += `<br>🎂 ${escapeHtml(item.petData.theme)}`; infoHtml += `</div>`; }
                 else infoHtml += `<div style="font-size:0.75rem;color:#666">x${item.cantidad}</div>`;
                 infoHtml += `</div>`;
-                const priceHtml = `<div style="font-weight:bold;color:#E07A5F;">$${(item.precio*item.cantidad).toFixed(2)}</div>`;
+                const priceHtml = `<div class="price-visible">${(item.precio*item.cantidad).toFixed(2)}</div>`;
                 const removeBtn = `<button class="cart-item-remove" onclick="removeCartItem(${idx})">✖ ${currentLang==='es'?'Eliminar':'Remove'}</button>`;
                 itemDiv.innerHTML = infoHtml + priceHtml + removeBtn;
                 itemsList.appendChild(itemDiv);
